@@ -15,7 +15,9 @@ class DashboardController extends Controller
     public function __construct(DashboardService $dashboardService)
     {
         $this->dashboardService = $dashboardService;
-        $this->authorizeResource(\App\Models\User::class);
+        
+        // Authorization is handled in the index method based on user roles
+        // Remove authorizeResource as it incorrectly checks User model permissions
     }
 
     /**
