@@ -247,9 +247,34 @@ class VisitController extends Controller
             $query->whereNull('id'); // No results if no accessible outlets
         }
 
-        // Filter by customer
+        // Filter by customer_search - supports both exact ID and text search
+        if (isset($filters['customer_search']) && !empty($filters['customer_search'])) {
+            $customerValue = $filters['customer_search'];
+            // Check if it's a numeric ID (exact match) or text search
+            if (is_numeric($customerValue)) {
+                $query->where('customer_id', $customerValue);
+            } else {
+                // Text search on customer name, email, mobile
+                $query->whereHas('customer', function ($q) use ($customerValue) {
+                    $q->where('name', 'like', '%' . $customerValue . '%')
+                      ->orWhere('email', 'like', '%' . $customerValue . '%')
+                      ->orWhere('mobile_json', 'like', '%' . $customerValue . '%');
+                });
+            }
+        }
+        
+        // Legacy support: customer_id parameter
         if (isset($filters['customer_id']) && !empty($filters['customer_id'])) {
-            $query->where('customer_id', $filters['customer_id']);
+            $customerValue = $filters['customer_id'];
+            if (is_numeric($customerValue)) {
+                $query->where('customer_id', $customerValue);
+            } else {
+                $query->whereHas('customer', function ($q) use ($customerValue) {
+                    $q->where('name', 'like', '%' . $customerValue . '%')
+                      ->orWhere('email', 'like', '%' . $customerValue . '%')
+                      ->orWhere('mobile_json', 'like', '%' . $customerValue . '%');
+                });
+            }
         }
 
         // Text search on customer name, email, mobile

@@ -12,6 +12,7 @@ class AuditLog extends \Illuminate\Database\Eloquent\Model
     protected $fillable = [
         'user_id',
         'action',
+        'event',
         'entity_type',
         'entity_id',
         'old_values',
@@ -60,6 +61,7 @@ class AuditLog extends \Illuminate\Database\Eloquent\Model
         return static::create([
             'user_id' => $userId,
             'action' => $action,
+            'event' => $action, // Also set event column for backward compatibility
             'entity_type' => $entityType,
             'entity_id' => $entityId,
             'old_values' => $oldValues,

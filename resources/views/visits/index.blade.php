@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const startDateInput = document.getElementById('start-date-filter');
     const endDateInput = document.getElementById('end-date-filter');
     const customerIdInput = document.getElementById('customer-id-filter');
+    const customerSearchBtn = document.getElementById('customer-search-btn');
     const searchInput = document.getElementById('visit-search-input');
+    const searchBtn = document.getElementById('search-btn');
     const resetBtn = document.getElementById('reset-btn');
     const resultsTableBody = document.querySelector('#visits-table tbody');
     const resultsCountDiv = document.getElementById('results-count');
@@ -334,6 +336,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }, DEBOUNCE_DELAY);
     }
     
+    // Handle customer input with debounce
+    function handleCustomerInput() {
+        currentPage = 1;
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+            console.log('Visit Live Search: Triggering customer search for:', customerIdInput ? customerIdInput.value : '');
+            fetchResults();
+        }, DEBOUNCE_DELAY);
+    }
+    
     // Attach events to filter inputs
     function attachFilterEvents() {
         console.log('Visit Live Search: Attaching event listeners...');
@@ -351,13 +363,32 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Visit Live Search: End date listener attached');
         }
         if (customerIdInput) {
-            customerIdInput.addEventListener('change', fetchResults);
-            console.log('Visit Live Search: Customer ID listener attached');
+            customerIdInput.addEventListener('input', handleCustomerInput);
+            customerIdInput.addEventListener('keyup', handleCustomerInput);
+            console.log('Visit Live Search: Customer ID input listener attached');
+        }
+        if (customerSearchBtn) {
+            customerSearchBtn.addEventListener('click', function() {
+                console.log('Visit Live Search: Customer search button clicked');
+                currentPage = 1;
+                clearTimeout(searchTimeout);
+                fetchResults();
+            });
+            console.log('Visit Live Search: Customer search button listener attached');
         }
         if (searchInput) {
             searchInput.addEventListener('input', handleInput);
             searchInput.addEventListener('keyup', handleInput);
             console.log('Visit Live Search: Search input listener attached');
+        }
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                console.log('Visit Live Search: Search button clicked');
+                currentPage = 1;
+                clearTimeout(searchTimeout);
+                fetchResults();
+            });
+            console.log('Visit Live Search: Search button listener attached');
         }
         if (resetBtn) {
             resetBtn.addEventListener('click', function(e) {
@@ -380,11 +411,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     attachFilterEvents();
     
-    // Trigger initial fetch if there are URL parameters
+    // Always trigger initial search to populate dynamic stats
+    console.log('Visit Live Search: Triggering initial search...');
+    fetchResults();
+    
+    // Trigger additional fetch if there are URL parameters (for filters)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.toString()) {
-        console.log('Visit Live Search: URL has params, triggering initial search...');
-        fetchResults();
+        console.log('Visit Live Search: URL has params, updating...');
     }
 });
 </script>
@@ -498,10 +532,14 @@ document.addEventListener('DOMContentLoaded', function() {
 {{-- Filters & Search --}}
 <div class="card mb-4">
     <div class="card-body py-3">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-2 col-sm-6">
-                <label class="form-label small fw-medium">Outlet</label>
-                <select class="form-select" id="outlet-filter">
+        <form id="visit-search-form" class="row g-3 align-items-end">
+            @csrf
+            {{-- Outlet Filter --}}
+            <div class="col-md-3 col-sm-6">
+                <label class="form-label small fw-medium">
+                    <i class="bi bi-shop me-1"></i>Outlet
+                </label>
+                <select class="form-select" name="outlet_id" id="outlet-filter">
                     <option value="">All Outlets</option>
                     @foreach($outlets as $outlet)
                     <option value="{{ $outlet->id }}" {{ request('outlet_id') == $outlet->id ? 'selected' : '' }}>
@@ -510,278 +548,258 @@ document.addEventListener('DOMContentLoaded', function() {
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2 col-sm-6">
-                <label class="form-label small fw-medium">Start Date</label>
-                <input type="date" class="form-control" id="start-date-filter" value="{{ request('start_date') }}">
-            </div>
-            <div class="col-md-2 col-sm-6">
-                <label class="form-label small fw-medium">End Date</label>
-                <input type="date" class="form-control" id="end-date-filter" value="{{ request('end_date') }}">
-            </div>
-            <div class="col-md-2 col-sm-6">
-                <label class="form-label small fw-medium">Customer ID</label>
-                <input type="number" class="form-control" id="customer-id-filter" value="{{ request('customer_id') }}" placeholder="Customer ID">
-            </div>
-            <div class="col-md-2 col-sm-6">
-                <label class="form-label small fw-medium">Search</label>
-                <input type="text" class="form-control" id="visit-search-input" value="{{ request('search') }}" placeholder="Name, email, phone..." autocomplete="off">
-            </div>
-            <div class="col-md-2 col-sm-12">
-                <div class="d-flex gap-2">
-                    <a href="{{ route('visits.index') }}" class="btn btn-outline-secondary" id="reset-btn" title="Reset">
-                        <i class="bi bi-arrow-clockwise"></i>
-                    </a>
+            {{-- Date Range --}}
+            <div class="col-md-4 col-sm-6">
+                <label class="form-label small fw-medium">
+                    <i class="bi bi-calendar-range me-1"></i>Date Range
+                </label>
+                <div class="input-group">
+                    <input type="date" class="form-control" name="start_date" id="start-date-filter" value="{{ request('start_date') }}">
+                    <span class="input-group-text bg-light">to</span>
+                    <input type="date" class="form-control" name="end_date" id="end-date-filter" value="{{ request('end_date') }}">
                 </div>
             </div>
-        </div>
+            {{-- Customer Search --}}
+            <div class="col-md-3 col-sm-6">
+                <label class="form-label small fw-medium">
+                    <i class="bi bi-person-search me-1"></i>Customer
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="customer_search" id="customer-search-input" value="{{ request('customer_search') }}" placeholder="Name, phone, or email..." autocomplete="off">
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+            {{-- Quick Search --}}
+            <div class="col-md-2 col-sm-6">
+                <label class="form-label small fw-medium">
+                    <i class="bi bi-search me-1"></i>Quick Search
+                </label>
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" id="visit-search-input" value="{{ request('search') }}" placeholder="Search..." autocomplete="off">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
-{{-- Results Count & Bulk Actions --}}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center">
-        <div class="text-muted me-3" id="results-count">
-            Showing <strong>{{ $visits->count() }}</strong> of <strong>{{ $visits->total() }}</strong> visits
-        </div>
-        <div id="live-search-loading" style="display:none;">
-            <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
-            <span class="text-muted small">Searching...</span>
-        </div>
-    </div>
-    <div class="form-check d-none" id="bulk-actions-toolbar">
-        <input class="form-check-input" type="checkbox" id="select-all">
-        <label class="form-check-label small" for="select-all">Select All</label>
-        <span class="ms-2 small text-muted"><span id="selected-count">0</span> selected</span>
-        <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="bulk-delete-btn" disabled>
-            <i class="bi bi-trash me-1"></i>Delete Selected
-        </button>
-    </div>
-</div>
-
-{{-- Visits Table --}}
-<div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0" id="visits-table">
-                <thead class="table-light">
-                    <tr>
-                        <th style="width: 40px;" class="text-center">
-                            <input class="form-check-input" type="checkbox" id="select-all-header">
-                        </th>
-                        <th style="width: 60px;">ID</th>
-                        <th style="width: 200px;">Customer</th>
-                        <th style="width: 140px;">Outlet</th>
-                        <th style="width: 140px;">Staff</th>
-                        <th style="width: 120px;" class="text-end">Bill Amount</th>
-                        <th style="width: 80px;" class="text-center">Points</th>
-                        <th style="width: 140px;">Visited At</th>
-                        <th style="width: 100px;" class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($visits as $visit)
-                    <tr data-id="{{ $visit->id }}">
-                        <td class="text-center">
-                            <input class="form-check-input visit-checkbox" type="checkbox" value="{{ $visit->id }}">
-                        </td>
-                        <td>
-                            <span class="text-muted small">#{{ $visit->id }}</span>
-                        </td>
-                        <td>
-                            @if($visit->customer)
-                            <div class="d-flex align-items-center">
-                                <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.75rem;">
-                                    {{ substr($visit->customer->name, 0, 1) }}
+{{-- Results --}}
+<div id="search-results">
+    {{-- Visits Table --}}
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="visits-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 40px;" class="text-center">
+                                <input class="form-check-input" type="checkbox" id="select-all-header">
+                            </th>
+                            <th style="width: 60px;">ID</th>
+                            <th style="width: 200px;">Customer</th>
+                            <th style="width: 140px;">Outlet</th>
+                            <th style="width: 140px;">Staff</th>
+                            <th style="width: 120px;" class="text-end">Bill Amount</th>
+                            <th style="width: 80px;" class="text-center">Points</th>
+                            <th style="width: 140px;">Visited At</th>
+                            <th style="width: 100px;" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visits-tbody">
+                        @forelse($visits as $visit)
+                        <tr data-id="{{ $visit->id }}">
+                            <td class="text-center">
+                                <input class="form-check-input visit-checkbox" type="checkbox" value="{{ $visit->id }}">
+                            </td>
+                            <td>
+                                <span class="text-muted small">#{{ $visit->id }}</span>
+                            </td>
+                            <td>
+                                @if($visit->customer)
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.75rem;">
+                                        {{ substr($visit->customer->name, 0, 1) }}
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="fw-semibold small text-truncate">{{ $visit->customer->name }}</div>
+                                        <small class="text-muted text-truncate d-block">{{ $visit->customer->mobile_json ? formatMobileNumber($visit->customer->mobile_json) : '-' }}</small>
+                                    </div>
                                 </div>
-                                <div class="overflow-hidden">
-                                    <div class="fw-semibold small text-truncate">{{ $visit->customer->name }}</div>
-                                    <small class="text-muted text-truncate d-block">{{ $visit->customer->mobile_json ? formatMobileNumber($visit->customer->mobile_json) : '-' }}</small>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($visit->outlet)
+                                <span class="badge bg-info">{{ $visit->outlet->name }}</span>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($visit->staff)
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-fill text-muted me-2"></i>
+                                    <span class="small text-truncate">{{ $visit->staff->name }}</span>
                                 </div>
-                            </div>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($visit->outlet)
-                            <span class="badge bg-info">{{ $visit->outlet->name }}</span>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($visit->staff)
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-person-fill text-muted me-2"></i>
-                                <span class="small text-truncate">{{ $visit->staff->name }}</span>
-                            </div>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td class="text-end fw-semibold">
-                            @if($visit->bill_amount > 0)
-                            {{ number_format($visit->bill_amount, 3) }}
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td class="text-center">
-                            @if($visit->points_awarded > 0)
-                            <span class="badge bg-success">{{ $visit->points_awarded }}</span>
-                            @else
-                            <span class="text-muted">-</span>
-                            @endif
-                        </td>
-                        <td>
-                            <div class="small">{{ $visit->visited_at->format('M d, Y') }}</div>
-                            <small class="text-muted">{{ $visit->visited_at->format('h:i A') }}</small>
-                        </td>
-                        <td class="text-center">
-                            <div class="dropdown d-inline-block">
-                                <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{{ route('visits.show', $visit) }}">
-                                        <i class="bi bi-eye me-2"></i>View Details
-                                    </a></li>
-                                    @can('visits.delete')
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form action="{{ route('visits.destroy', $visit) }}" method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this visit?')">
-                                                <i class="bi bi-trash me-2"></i>Delete
-                                            </button>
-                                        </form>
-                                    </li>
-                                    @endcan
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="9" class="text-center py-5">
-                            <div class="text-muted">
-                                <i class="bi bi-calendar-check display-4"></i>
-                                <p class="mt-2 mb-0">No visits found matching your criteria</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="text-end fw-semibold">
+                                @if($visit->bill_amount > 0)
+                                {{ number_format($visit->bill_amount, 3) }}
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($visit->points_awarded > 0)
+                                <span class="badge bg-success">{{ $visit->points_awarded }}</span>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="small">{{ $visit->visited_at->format('M d, Y') }}</div>
+                                <small class="text-muted">{{ $visit->visited_at->format('h:i A') }}</small>
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown d-inline-block">
+                                    <button class="btn btn-sm btn-light" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{{ route('visits.show', $visit) }}">
+                                            <i class="bi bi-eye me-2"></i>View Details
+                                        </a></li>
+                                        @can('visits.delete')
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('visits.destroy', $visit) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item text-danger" onclick="return confirm('Are you sure you want to delete this visit?')">
+                                                    <i class="bi bi-trash me-2"></i>Delete
+                                                </button>
+                                            </form>
+                                        </li>
+                                        @endcan
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="9" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="bi bi-calendar-check display-4"></i>
+                                    <p class="mt-2 mb-0">No visits found</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-{{-- Pagination --}}
-<div class="mt-4 d-flex justify-content-center">
-    {{ $visits->appends(request()->query())->links() }}
+    {{-- Pagination --}}
+    <div class="mt-4 d-flex justify-content-center">
+        {{ $visits->appends(request()->query())->links() }}
+    </div>
 </div>
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const table = document.getElementById('visits-table');
-    const selectAllHeader = document.getElementById('select-all-header');
-    const selectAll = document.getElementById('select-all');
-    const bulkToolbar = document.getElementById('bulk-actions-toolbar');
-    const selectedCount = document.getElementById('selected-count');
-    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
-    const checkboxes = table ? table.querySelectorAll('.visit-checkbox') : [];
-
-    // Show toolbar when any checkbox is selected
-    function updateToolbar() {
-        if (!table) return;
-        
-        const checked = table.querySelectorAll('.visit-checkbox:checked');
-        const count = checked.length;
-        if (selectedCount) selectedCount.textContent = count;
-        if (bulkDeleteBtn) bulkDeleteBtn.disabled = count === 0;
-        
-        if (count > 0) {
-            bulkToolbar.classList.remove('d-none');
-        } else {
-            bulkToolbar.classList.add('d-none');
-        }
-
-        // Update select all checkbox state
-        if (selectAllHeader) {
-            selectAllHeader.checked = count === checkboxes.length;
-            selectAllHeader.indeterminate = count > 0 && count < checkboxes.length;
-        }
-        if (selectAll) {
-            selectAll.checked = count === checkboxes.length;
-            selectAll.indeterminate = count > 0 && count < checkboxes.length;
-        }
-    }
-
-    // Select all in header
-    if (selectAllHeader) {
-        selectAllHeader.addEventListener('change', function() {
-            checkboxes.forEach(cb => {
-                cb.checked = selectAllHeader.checked;
-            });
-            updateToolbar();
+    const searchForm = document.getElementById('visit-search-form');
+    const searchInputs = searchForm ? searchForm.querySelectorAll('input[type="text"], input[type="date"], select') : [];
+    const searchButtons = searchForm ? searchForm.querySelectorAll('button[type="submit"]') : [];
+    
+    // Handle form submission
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            performSearch();
         });
     }
-
-    // Select all in toolbar
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            checkboxes.forEach(cb => {
-                cb.checked = selectAll.checked;
-            });
-            updateToolbar();
+    
+    // Handle search button clicks
+    searchButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            performSearch();
         });
-    }
-
-    // Individual checkbox change
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', updateToolbar);
     });
-
-    // Bulk delete
-    if (bulkDeleteBtn) {
-        bulkDeleteBtn.addEventListener('click', function() {
-            if (!table) return;
-            
-            const checked = table.querySelectorAll('.visit-checkbox:checked');
-            if (checked.length === 0) return;
-
-            if (!confirm('Are you sure you want to delete ' + checked.length + ' visit(s)?')) {
-                return;
-            }
-
-            const ids = Array.from(checked).map(cb => cb.value);
-            
-            // Send delete request
-            fetch('{{ route("visits.index") }}/bulk-delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ ids: ids })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error deleting visits: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Error deleting visits: ' + error.message);
+    
+    // Handle select changes
+    searchInputs.forEach(function(input) {
+        if (input.type === 'select-one') {
+            input.addEventListener('change', function() {
+                performSearch();
             });
+        }
+    });
+    
+    function performSearch() {
+        if (!searchForm) return;
+        
+        const formData = new FormData(searchForm);
+        const params = new URLSearchParams();
+        
+        formData.forEach(function(value, key) {
+            if (value.trim()) {
+                params.set(key, value.trim());
+            }
         });
+        
+        const url = '{{ route("visits.live-search") }}?' + params.toString();
+        const tbody = document.getElementById('visits-tbody');
+        
+        fetch(url)
+            .then(function(response) {
+                if (!response.ok) throw new Error('Search failed');
+                return response.json();
+            })
+            .then(function(data) {
+                if (tbody && data.visits) {
+                    if (data.visits.length > 0) {
+                        tbody.innerHTML = data.visits.map(function(visit) {
+                            return '<tr data-id="' + visit.id + '">' +
+                                '<td class="text-center"><input class="form-check-input visit-checkbox" type="checkbox" value="' + visit.id + '"></td>' +
+                                '<td><span class="text-muted small">#' + visit.id + '</span></td>' +
+                                '<td>' + (visit.customer_name ? 
+                                    '<div class="d-flex align-items-center"><div class="user-avatar me-2" style="width: 32px; height: 32px; font-size: 0.75rem;">' + (visit.customer_initial || '?') + '</div><div class="overflow-hidden"><div class="fw-semibold small text-truncate">' + visit.customer_name + '</div><small class="text-muted text-truncate d-block">' + (visit.customer_mobile || '-') + '</small></div></div>' : 
+                                    '<span class="text-muted">-</span>') + '</td>' +
+                                '<td>' + (visit.outlet_name ? '<span class="badge bg-info">' + visit.outlet_name + '</span>' : '<span class="text-muted">-</span>') + '</td>' +
+                                '<td>' + (visit.staff_name ? '<div class="d-flex align-items-center"><i class="bi bi-person-fill text-muted me-2"></i><span class="small text-truncate">' + visit.staff_name + '</span></div>' : '<span class="text-muted">-</span>') + '</td>' +
+                                '<td class="text-end fw-semibold">' + (visit.bill_amount > 0 ? parseFloat(visit.bill_amount).toLocaleString() : '<span class="text-muted">-</span>') + '</td>' +
+                                '<td class="text-center">' + (visit.points_awarded > 0 ? '<span class="badge bg-success">' + visit.points_awarded + '</span>' : '<span class="text-muted">-</span>') + '</td>' +
+                                '<td><div class="small">' + visit.visited_date + '</div><small class="text-muted">' + visit.visited_time + '</small></td>' +
+                                '<td class="text-center"><div class="dropdown d-inline-block"><button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button><ul class="dropdown-menu dropdown-menu-end"><li><a class="dropdown-item" href="' + visit.show_url + '"><i class="bi bi-eye me-2"></i>View Details</a></li></ul></div></td>' +
+                                '</tr>';
+                        }).join('');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5"><div class="text-muted"><i class="bi bi-calendar-check display-4"></i><p class="mt-2 mb-0">No visits found matching your criteria</p></div></td></tr>';
+                    }
+                }
+                
+                // Update URL without reload
+                window.history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+            })
+            .catch(function(error) {
+                console.error('Search error:', error);
+            });
     }
+    
+    // Console log for debugging
+    console.log('Visit Search initialized. Enter search terms and click search button.');
 });
 </script>
 @endpush
-@endsection

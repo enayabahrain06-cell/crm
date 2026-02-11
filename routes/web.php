@@ -39,10 +39,10 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\Web\DashboardController::class, 'index'])->name('dashboard');
 
-    // Customers
-    Route::resource('customers', App\Http\Controllers\Web\CustomerController::class);
+    // Customers - Custom routes must be defined BEFORE resource routes to avoid being caught as parameters
     Route::get('customers/live-search', [App\Http\Controllers\Web\CustomerController::class, 'liveSearch'])->name('customers.live-search');
     Route::get('customers/autocomplete', [App\Http\Controllers\Web\CustomerController::class, 'autocomplete'])->name('customers.autocomplete');
+    Route::resource('customers', App\Http\Controllers\Web\CustomerController::class);
     Route::get('customers/{customer}/360', [App\Http\Controllers\Web\CustomerController::class, 'show360'])->name('customers.360');
     Route::get('customers/{customer}/export-pdf', [App\Http\Controllers\Web\CustomerController::class, 'exportPdf'])->name('customers.export-pdf');
     Route::post('customers/{customer}/tags', [App\Http\Controllers\Web\CustomerController::class, 'addTag'])->name('customers.tags');

@@ -301,25 +301,66 @@ class Customer extends \Illuminate\Database\Eloquent\Model
 
     /**
      * Search scope - Fixed to properly handle mobile JSON searches
+     * Compatible with both SQLite and MySQL databases
      */
     public function scopeSearch($query, string $search)
     {
-        // Clean search term - remove common formatting characters
-        $cleanSearch = preg_replace('/[^0-9]/', '', $search);
+        // Check if search looks like an email (contains @)
+        $looksLikeEmail = str_contains($search, '@');
         
-        return $query->where(function ($q) use ($search, $cleanSearch) {
+        // Check if search is primarily a phone number (starts with + or all digits)
+        // Don't apply phone search logic for email-like searches
+        $isPhoneSearch = !$looksLikeEmail && (
+            str_starts_with($search, '+') || 
+            preg_match('/^[0-9\s\-\(\)]+$/', $search) === 1
+        );
+        
+        // Clean search term - remove common formatting characters (spaces, dashes, parentheses)
+        $cleanSearch = $isPhoneSearch ? preg_replace('/[^0-9]/', '', $search) : '';
+        
+        return $query->where(function ($q) use ($search, $cleanSearch, $looksLikeEmail, $isPhoneSearch) {
+            // Search by name (partial match, case-insensitive)
             $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('company_name', 'like', "%{$search}%");
+              ->orWhere('name', 'like', "%" . strtolower($search) . "%")
+              ->orWhere('name', 'like', "%" . ucfirst(strtolower($search)) . "%");
             
-            // Search in mobile_e164 (clean format like +97312345678)
-            if (!empty($cleanSearch)) {
-                $q->orWhere('mobile_e164', 'like', "%{$cleanSearch}%");
+            // Search by email - use exact match if it looks like an email, otherwise partial
+            if ($looksLikeEmail) {
+                // For email searches, try exact match first, then partial
+                $q->orWhere('email', $search)  // Exact match
+                  ->orWhere('email', 'like', "%{$search}%");  // Partial match as fallback
+            } else {
+                $q->orWhere('email', 'like', "%{$search}%");
             }
             
-            // Search in mobile_json national_number field using JSON query
-            if (!empty($cleanSearch)) {
-                $q->orWhereRaw('json_extract(mobile_json, "$.national_number") LIKE ?', ["%{$cleanSearch}%"]);
+            // Search by company name
+            $q->orWhere('company_name', 'like', "%{$search}%");
+            
+            // Only search phone fields if it looks like a phone number
+            if ($isPhoneSearch && !empty($cleanSearch) && strlen($cleanSearch) >= 3) {
+                // Search in mobile_e164 (clean format like +97312345678)
+                $q->orWhere('mobile_e164', 'like', "%{$cleanSearch}%");
+                
+                // Also try with leading + if not present
+                if (strpos($cleanSearch, '+') !== 0) {
+                    $q->orWhere('mobile_e164', 'like', "%+{$cleanSearch}%");
+                }
+                
+                // Search in mobile_json national_number field using JSON query
+                // This handles the mobile_json array structure: {"national_number": "12345678", "e164": "+97312345678", ...}
+                $q->orWhere(function($innerQ) use ($cleanSearch) {
+                    $innerQ->whereNotNull('mobile_json')
+                           ->where('mobile_json', '!=', '')
+                           ->where(function($subQ) use ($cleanSearch) {
+                               // Search in national_number field of mobile_json
+                               $subQ->whereRaw("json_extract(mobile_json, '$.national_number') LIKE ?", ["%{$cleanSearch}%"])
+                                    ->orWhereRaw("json_extract(mobile_json, '$.national_number') LIKE ?", ["{$cleanSearch}%"])
+                                    ->orWhereRaw("json_extract(mobile_json, '$.national_number') LIKE ?", ["%{$cleanSearch}"]);
+                           });
+                });
+                
+                // Also try searching the entire mobile_json as a string (for SQLite compatibility)
+                $q->orWhere('mobile_json', 'like', "%{$cleanSearch}%");
             }
         });
     }

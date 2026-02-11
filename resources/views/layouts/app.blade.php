@@ -899,52 +899,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <!-- Axios for AJAX requests -->
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.2/dist/axios.min.js"></script>
-    <!-- Custom JS -->
-    <script>
-        // Sidebar toggle for mobile
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
-                sidebarOverlay.classList.toggle('show');
-            });
-        }
-
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', function() {
-                sidebar.classList.remove('show');
-                sidebarOverlay.classList.remove('show');
-            });
-        }
-
-        // Handle chevron rotation for collapsible sections
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(trigger => {
-            trigger.addEventListener('click', function() {
-                setTimeout(() => {
-                    const chevron = this.querySelector('.chevron-icon');
-                    if (chevron) {
-                        chevron.style.transform = this.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
-                    }
-                }, 10);
-            });
-        });
-
-        // Close sidebar on route change (for SPA-like behavior)
-        if (window.innerWidth < 992) {
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    sidebar.classList.remove('show');
-                    sidebarOverlay.classList.remove('show');
-                });
-            });
-        }
-    </script>
-    @stack('scripts')
+    <!-- Custom JS (includes axios with credentials configured) -->
+    <script src="{{ asset('build/assets/app-DgMpcWWK.js') }}"></script>
 </body>
 </html>
 

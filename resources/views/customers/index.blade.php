@@ -6,11 +6,17 @@
 @section('content')
 <div class="card mb-4">
     <div class="card-body">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Search</label>
-                <input type="text" class="form-control" id="customer-search-input" name="search" value="{{ request('search') }}" placeholder="Name, email, phone..." autocomplete="off">
-            </div>
+        <form action="{{ route('customers.index') }}" method="GET" id="customer-search-form">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="customer-search-input" name="search" value="{{ request('search') }}" placeholder="Name, email, phone..." autocomplete="off">
+                        <button class="btn btn-outline-primary" type="submit" id="customer-search-btn" title="Search">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
             <div class="col-md-2">
                 <label class="form-label">Type</label>
                 <select class="form-select" id="customer-type-select" name="type">
@@ -51,7 +57,8 @@
                     <i class="bi bi-arrow-clockwise"></i>
                 </a>
             </div>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -257,6 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // DOM Elements
     var searchInput = document.getElementById('customer-search-input');
+    var searchBtn = document.getElementById('customer-search-btn');
     var typeSelect = document.getElementById('customer-type-select');
     var genderSelect = document.getElementById('customer-gender-select');
     var nationalitySelect = document.getElementById('customer-nationality-select');
@@ -517,6 +525,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (searchInput) {
             searchInput.addEventListener('input', handleInput);
             console.log('Customer Live Search: Search input listener attached');
+        }
+        
+        // Search button click handler
+        if (searchBtn) {
+            searchBtn.addEventListener('click', function() {
+                console.log('Customer Live Search: Button clicked, triggering search...');
+                fetchResults();
+            });
+            console.log('Customer Live Search: Search button listener attached');
         }
         
         if (typeSelect) {
