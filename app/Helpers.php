@@ -94,8 +94,9 @@ if (!function_exists('getCountryName')) {
 if (!function_exists('getCountryFlag')) {
     function getCountryFlag(?string $iso2): string
     {
-        if (!$iso2) return '';
+        if (!$iso2 || strlen($iso2) !== 2) return '';
         
+        // Predefined flags for common countries (faster lookup)
         $flags = [
             'BH' => '🇧🇭', 'SA' => '🇸🇦', 'AE' => '🇦🇪', 'KW' => '🇰🇼', 'QA' => '🇶🇦',
             'OM' => '🇴🇲', 'EG' => '🇪🇬', 'JO' => '🇯🇴', 'LB' => '🇱🇧', 'SY' => '🇸🇾',
@@ -103,7 +104,17 @@ if (!function_exists('getCountryFlag')) {
             'GB' => '🇬🇧', 'DE' => '🇩🇪', 'FR' => '🇫🇷',
         ];
         
-        return $flags[$iso2] ?? '';
+        // Return predefined flag if available
+        if (isset($flags[$iso2])) {
+            return $flags[$iso2];
+        }
+        
+        // Dynamically generate flag from ISO2 code using Unicode regional indicators
+        // This works for any 2-letter ISO2 code
+        $firstChar = ord(strtoupper($iso2[0])) - ord('A') + 0x1F1E6;
+        $secondChar = ord(strtoupper($iso2[1])) - ord('A') + 0x1F1E6;
+        
+        return json_decode('"' . $firstChar . $secondChar . '"');
     }
 }
 

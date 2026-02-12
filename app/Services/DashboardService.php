@@ -538,5 +538,90 @@ class DashboardService
             'customers' => $birthdays->toArray(),
         ];
     }
+
+    /**
+     * Get outlet revenue by month for a given year
+     * Returns monthly revenue totals for each outlet
+     * SQLite-compatible date extraction
+     */
+    public function getOutletRevenueByMonth(int $year, ?int $outletId = null): array
+    {
+        $months = [
+            1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+            5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+            9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+        ];
+
+        // Build base query
+        $visitQuery = Visit::query()
+            ->whereYear('visited_at', $year)
+            ->where('bill_amount', '>', 0);
+
+        if ($outletId) {
+            $visitQuery->where('outlet_id', $outletId);
+        }
+
+        // Get outlets
+        $outlets = Outlet::active()
+            ->when($outletId, fn($q) => $q->where('id', $outletId))
+            ->get();
+
+        $result = [
+            'year' => $year,
+            'months' => array_values($months),
+            'outlets' => []
+        ];
+
+        // Generate distinct colors for each outlet
+        $colors = [
+            '#EC4899', '#6366F1', '#10B981', '#F59E0B', '#3B82F6',
+            '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6B7280',
+            '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F43F5E'
+        ];
+
+        foreach ($outlets as $index => $outlet) {
+            $monthlyRevenue = [];
+
+            for ($month = 1; $month <= 12; $month++) {
+                $revenue = Visit::where('outlet_id', $outlet->id)
+                    ->whereYear('visited_at', $year)
+                    ->whereMonth('visited_at', $month)
+                    ->sum('bill_amount');
+
+                $monthlyRevenue[] = round($revenue, 3);
+            }
+
+            $result['outlets'][] = [
+                'id' => $outlet->id,
+                'name' => $outlet->name,
+                'color' => $colors[$index % count($colors)],
+                'monthly_revenue' => $monthlyRevenue
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get available years for revenue data
+     * Returns years that have visit data
+     */
+    public function getAvailableYears(): array
+    {
+        $years = Visit::selectRaw('DISTINCT strftime("%Y", visited_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        $currentYear = now()->year;
+
+        if (!in_array($currentYear, $years)) {
+            $years[] = (string) $currentYear;
+            sort($years);
+            $years = array_reverse($years);
+        }
+
+        return $years ?: [(string) $currentYear];
+    }
 }
 

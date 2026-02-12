@@ -36,8 +36,6 @@ $currencySymbol = match($systemCurrency) {
         </div>
     </div>
 </div>
-
-{{-- Key Metrics Section --}}
 <div class="row g-4 mb-5">
     <div class="col-md-6 col-xl-3">
         <a href="{{ route('customers.index') }}" class="text-decoration-none">
@@ -70,9 +68,9 @@ $currencySymbol = match($systemCurrency) {
     <div class="col-md-6 col-xl-3">
         <a href="{{ route('reports.loyalty') }}" class="text-decoration-none">
             @include('components.stat-card', [
-                'value' => $currencySymbol . number_format($summary['visits']['total_spend'] ?? 0, 3),
+                'value' => $currencySymbol . number_format($summary['visits']['total_spend'] ?? 0),
                 'label' => 'Total Revenue',
-                'change' => $currencySymbol . number_format($summary['visits']['total_spend'] ?? 0, 3) . ' this period',
+                'change' => $currencySymbol . number_format($summary['visits']['total_spend'] ?? 0) . ' this period',
                 'changeType' => 'positive',
                 'iconClass' => 'bi bi-cash-stack',
                 'iconBg' => '#FEF3C7',
@@ -104,8 +102,8 @@ $currencySymbol = match($systemCurrency) {
             @php
             $genderGroups = $demographics['genders'] ?? [];
             $totalGender = array_sum($genderGroups);
-            $genderLabels = ['male' => 'Male', 'female' => 'Female', 'other' => 'Other', 'unknown' => 'Prefer not to say'];
-            $genderColors = ['male' => '#6366F1', 'female' => '#EC4899', 'other' => '#FBBF24', 'unknown' => '#94A3B8'];
+            $genderLabels = ['male' => 'Male', 'female' => 'Female'];
+            $genderColors = ['male' => '#EC4899', 'female' => '#6366F1'];
             @endphp
             @if(!empty($genderGroups) && $totalGender > 0)
             <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
@@ -591,3 +589,4 @@ $currencySymbol = match($systemCurrency) {
 
 {{-- The rest of your code (Analytics widgets, Age Groups, Chart.js scripts, styles) remains exactly the same --}}
 @endsection
+

@@ -113,10 +113,8 @@
                         <div class="col-md-4">
                             <label class="form-label">Gender</label>
                             <select class="form-select @error('gender') is-invalid @enderror" name="gender">
-                                <option value="unknown" {{ old('gender', 'unknown') === 'unknown' ? 'selected' : '' }}>Prefer not to say</option>
-                                <option value="male" {{ old('gender') === 'male' ? 'selected' : '' }}>Male</option>
+                                <option value="male" {{ old('gender', 'male') === 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                                <option value="other" {{ old('gender') === 'other' ? 'selected' : '' }}>Other</option>
                             </select>
                             @error('gender')
                                 <div class="invalid-feedback">{{ $message }}</div>

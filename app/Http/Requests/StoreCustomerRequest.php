@@ -20,7 +20,7 @@ class StoreCustomerRequest extends FormRequest
             'country_code' => 'required_with:mobile_number|string|size:2',
             'mobile_number' => 'required_with:country_code|string|max:20',
             'nationality' => 'nullable|string|size:2',
-            'gender' => 'nullable|in:male,female,other,unknown',
+            'gender' => 'nullable|in:male,female',
             'date_of_birth' => 'nullable|date',
             'address' => 'nullable|string',
             'company_name' => 'nullable|required_if:type,corporate|string|max:100',

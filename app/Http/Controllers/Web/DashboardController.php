@@ -41,6 +41,11 @@ class DashboardController extends Controller
         $campaignPerformance = $this->dashboardService->getCampaignPerformance($filters);
         $birthdaysThisMonth = $this->dashboardService->getBirthdaysThisMonth($filters);
 
+        // Outlet revenue by month data
+        $selectedYear = (int) $request->get('year', now()->year);
+        $outletRevenue = $this->dashboardService->getOutletRevenueByMonth($selectedYear);
+        $availableYears = $this->dashboardService->getAvailableYears();
+
         return view('dashboard.index', compact(
             'summary',
             'demographics',
@@ -53,7 +58,10 @@ class DashboardController extends Controller
             'guestNationalities',
             'ageDistribution',
             'campaignPerformance',
-            'birthdaysThisMonth'
+            'birthdaysThisMonth',
+            'outletRevenue',
+            'selectedYear',
+            'availableYears'
         ));
     }
 

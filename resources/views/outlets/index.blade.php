@@ -3,6 +3,19 @@
 @section('title', 'Outlets')
 @section('page-title', 'Outlet Management')
 
+@php
+$systemCurrency = setting('currency', 'BHD');
+$currencySymbol = match($systemCurrency) {
+    'USD' => '$',
+    'EUR' => '€',
+    'GBP' => '£',
+    'BHD' => 'BHD ',
+    'SAR' => 'SR ',
+    'AED' => 'AED ',
+    default => $systemCurrency . ' '
+};
+@endphp
+
 @section('content')
 {{-- Header --}}
 <div class="row mb-4">
@@ -84,6 +97,172 @@
                         <div class="text-muted small">Total Users</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Outlet Revenue by Month Section --}}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="bi bi-currency-dollar me-2"></i>Outlet Revenue by Month
+                    </h5>
+                    <form method="GET" action="{{ route('outlets.index') }}" class="d-flex align-items-center gap-2">
+                        <label for="yearSelect" class="form-label mb-0 text-muted small fw-medium">Year:</label>
+                        <select name="year" id="yearSelect" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                            @foreach($availableYears as $year)
+                            <option value="{{ $year }}" {{ $selectedYear == $year ? 'selected' : '' }}>{{ $year }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                @php
+                $revenueOutlets = $outletRevenue['outlets'] ?? [];
+                $months = $outletRevenue['months'] ?? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                @endphp
+                
+                @if(!empty($revenueOutlets))
+                <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                    <canvas id="outletRevenueChart"></canvas>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const ctx = document.getElementById('outletRevenueChart').getContext('2d');
+                        
+                        const months = @json($months);
+                        const outlets = @json($revenueOutlets);
+                        const currencySymbol = @json($currencySymbol);
+                        
+                        // Prepare datasets for Chart.js
+                        const datasets = outlets.map((outlet, index) => ({
+                            label: outlet.name,
+                            data: outlet.monthly_revenue,
+                            borderColor: outlet.color,
+                            backgroundColor: outlet.color + '20',
+                            borderWidth: 3,
+                            pointBackgroundColor: outlet.color,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5,
+                            pointHoverRadius: 8,
+                            fill: false,
+                            tension: 0.3
+                        }));
+                        
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: months,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    mode: 'index',
+                                    intersect: false
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            padding: 20,
+                                            usePointStyle: true,
+                                            pointStyle: 'circle',
+                                            font: {
+                                                size: 12,
+                                                weight: '500'
+                                            },
+                                            color: '#475569'
+                                        }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        padding: 14,
+                                        cornerRadius: 10,
+                                        titleFont: {
+                                            size: 14,
+                                            weight: '600'
+                                        },
+                                        bodyFont: {
+                                            size: 13
+                                        },
+                                        callbacks: {
+                                            label: function(context) {
+                                                const value = context.raw;
+                                                const formattedValue = currencySymbol + Math.round(value).toLocaleString();
+                                                return `${context.dataset.label}: ${formattedValue}`;
+                                            },
+                                            footer: function(tooltipItems) {
+                                                let total = 0;
+                                                tooltipItems.forEach(function(tooltipItem) {
+                                                    total += tooltipItem.raw;
+                                                });
+                                                return '\nTotal: ' + currencySymbol + Math.round(total).toLocaleString();
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            color: '#64748B',
+                                            font: {
+                                                size: 11,
+                                                weight: '500'
+                                            }
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(226, 232, 240, 0.6)'
+                                        },
+                                        ticks: {
+                                            color: '#64748B',
+                                            font: {
+                                                size: 11
+                                            },
+                                            callback: function(value) {
+                                                return currencySymbol + value.toLocaleString();
+                                            }
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Revenue',
+                                            font: {
+                                                size: 12,
+                                                weight: '600'
+                                            },
+                                            color: '#64748B'
+                                        }
+                                    }
+                                },
+                                animation: {
+                                    duration: 1000,
+                                    easing: 'easeOutQuart'
+                                }
+                            }
+                        });
+                    });
+                </script>
+                @else
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-currency-dollar display-4 mb-3 d-block" style="color: #CBD5E1;"></i>
+                    <p class="mb-0">No revenue data available for {{ $selectedYear }}</p>
+                </div>
+                @endif
             </div>
         </div>
     </div>

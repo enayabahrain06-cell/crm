@@ -7,16 +7,24 @@ use App\Http\Requests\StoreOutletRequest;
 use App\Http\Requests\UpdateOutletRequest;
 use App\Models\Outlet;
 use App\Models\OutletSocialLink;
+use App\Services\DashboardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class OutletController extends Controller
 {
+    protected $dashboardService;
+
+    public function __construct(DashboardService $dashboardService)
+    {
+        $this->dashboardService = $dashboardService;
+    }
+
     /**
      * Display outlets list
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('outlets.view');
 
@@ -28,7 +36,17 @@ class OutletController extends Controller
             $outlets = $user->outlets()->withCount('users')->get();
         }
 
-        return view('outlets.index', compact('outlets'));
+        // Get outlet revenue by month data
+        $selectedYear = (int) $request->get('year', now()->year);
+        $outletRevenue = $this->dashboardService->getOutletRevenueByMonth($selectedYear);
+        $availableYears = $this->dashboardService->getAvailableYears();
+
+        return view('outlets.index', compact(
+            'outlets',
+            'outletRevenue',
+            'selectedYear',
+            'availableYears'
+        ));
     }
 
     /**

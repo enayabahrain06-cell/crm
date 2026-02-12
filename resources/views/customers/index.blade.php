@@ -31,7 +31,6 @@
                     <option value="">All</option>
                     <option value="male" {{ request('gender') === 'male' ? 'selected' : '' }}>Male</option>
                     <option value="female" {{ request('gender') === 'female' ? 'selected' : '' }}>Female</option>
-                    <option value="other" {{ request('gender') === 'other' ? 'selected' : '' }}>Other</option>
                 </select>
             </div>
             <div class="col-md-2">
