@@ -45,15 +45,15 @@ class VisitController extends Controller
         }
 
         // Filter by customer
-        if ($request->has('customer_id')) {
+        if ($request->filled('customer_id')) {
             $query->where('customer_id', $request->get('customer_id'));
         }
 
         // Date range
-        if ($request->has('start_date')) {
+        if ($request->filled('start_date')) {
             $query->whereDate('visited_at', '>=', $request->get('start_date'));
         }
-        if ($request->has('end_date')) {
+        if ($request->filled('end_date')) {
             $query->whereDate('visited_at', '<=', $request->get('end_date'));
         }
 
