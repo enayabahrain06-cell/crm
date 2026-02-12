@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+    <div class="col-12">
         {{-- Header Card --}}
         <div class="card mb-4">
             <div class="card-body">
@@ -63,7 +63,13 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small">Nationality</label>
-                                <div class="fw-medium">{{ $profile->nationality ?? 'N/A' }}</div>
+                                <div class="fw-medium">
+                                    @if($profile->nationality)
+                                        {{ getCountryFlag($profile->nationality) }} {{ countryName($profile->nationality) }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="text-muted small">Date of Birth</label>

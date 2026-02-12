@@ -127,8 +127,12 @@
                             @endif
                         </td>
                         <td>
+                            @if($customer->nationality)
                             <span class="flag-icon me-1">{{ getCountryFlag($customer->nationality) }}</span>
-                            {{ $customer->nationality ?: 'N/A' }}
+                            {{ countryName($customer->nationality) }}
+                            @else
+                            <span class="text-muted">N/A</span>
+                            @endif
                         </td>
                         <td>
                             @if($customer->wallet)
@@ -431,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     var companyHtml = customer.company_name ? '<small class="text-muted">' + customer.company_name + '</small>' : '';
                     var mobileHtml = customer.mobile ? '<small class="text-muted">' + customer.mobile + '</small>' : '';
                     var countryFlag = customer.country_flag ? '<span class="flag-icon me-1">' + customer.country_flag + '</span>' : '';
-                    var nationality = customer.nationality ? customer.nationality : 'N/A';
+                    var nationality = customer.nationality_name ? customer.nationality_name : 'N/A';
                     var points = customer.points !== undefined ? customer.points.toLocaleString() : '0';
                     var visitsCount = customer.visits_count !== undefined ? customer.visits_count : '0';
                     
@@ -439,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     html += '<td><div class="d-flex align-items-center"><div class="user-avatar me-3" style="width: 36px; height: 36px; font-size: 0.875rem;">' + customer.name.charAt(0) + '</div><div><div class="fw-semibold">' + customer.name + '</div>' + companyHtml + '</div></div></td>';
                     html += '<td><span class="badge bg-' + typeBadge + '">' + typeLabel + '</span></td>';
                     html += '<td><div>' + (customer.email || 'No email') + '</div>' + mobileHtml + '</td>';
-                    html += '<td>' + countryFlag + nationality + '</td>';
+                    html += '<td>' + (customer.country_flag ? customer.country_flag + ' ' + customer.nationality_name : '<span class="text-muted">N/A</span>') + '</td>';
                     html += '<td><span class="fw-semibold">' + points + '</span></td>';
                     html += '<td>' + visitsCount + '</td>';
                     html += '<td><span class="badge badge-status badge-' + statusClass + '">' + statusLabel + '</span></td>';

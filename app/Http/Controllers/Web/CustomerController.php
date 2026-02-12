@@ -339,6 +339,7 @@ class CustomerController extends Controller
                     'mobile_json' => $customer->mobile_json,
                     'type' => $customer->type,
                     'nationality' => $customer->nationality,
+                    'nationality_name' => countryName($customer->nationality),
                     'country_flag' => getCountryFlag($customer->nationality),
                     'company_name' => $customer->company_name,
                     'status' => $customer->status,

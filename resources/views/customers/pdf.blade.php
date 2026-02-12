@@ -171,7 +171,7 @@
                         </div>
                         <div class="col">
                             <div class="label">Nationality</div>
-                            <div class="value">{{ $profile->nationality ?? 'N/A' }}</div>
+                            <div class="value">{{ $profile->nationality ? countryFlag($profile->nationality) . ' ' . countryName($profile->nationality) : 'N/A' }}</div>
                         </div>
                     </div>
                     <div class="row">

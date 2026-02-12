@@ -173,14 +173,14 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label for="timezone" class="form-label">Timezone</label>
-                                <select class="form-select" id="timezone" name="timezone">
-                                    <option value="UTC" {{ setting('timezone') === 'UTC' ? 'selected' : '' }}>UTC</option>
-                                    <option value="America/New_York" {{ setting('timezone') === 'America/New_York' ? 'selected' : '' }}>Eastern Time</option>
-                                    <option value="Europe/London" {{ setting('timezone') === 'Europe/London' ? 'selected' : '' }}>London</option>
-                                    <option value="Asia/Dubai" {{ setting('timezone') === 'Asia/Dubai' ? 'selected' : '' }}>Dubai</option>
-                                    <option value="Asia/Bahrain" {{ setting('timezone') === 'Asia/Bahrain' ? 'selected' : '' }}>Bahrain</option>
-                                </select>
+                                <x-timezone-dropdown 
+                                    name="timezone" 
+                                    id="timezone" 
+                                    :value="setting('timezone', 'BH')" 
+                                    :required="false" 
+                                    label="Timezone"
+                                    placeholder="Select Timezone"
+                                />
                             </div>
                             <div class="col-md-4">
                                 <label for="date_format" class="form-label">Date Format</label>
@@ -191,14 +191,14 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label for="currency" class="form-label">Currency</label>
-                                <select class="form-select" id="currency" name="currency">
-                                    <option value="USD" {{ setting('currency') === 'USD' ? 'selected' : '' }}>USD ($)</option>
-                                    <option value="EUR" {{ setting('currency') === 'EUR' ? 'selected' : '' }}>EUR (€)</option>
-                                    <option value="GBP" {{ setting('currency') === 'GBP' ? 'selected' : '' }}>GBP (£)</option>
-                                    <option value="AED" {{ setting('currency') === 'AED' ? 'selected' : '' }}>AED (د.إ)</option>
-                                    <option value="BHD" {{ setting('currency') === 'BHD' ? 'selected' : '' }}>BHD (.د.ب)</option>
-                                </select>
+                                <x-currency-dropdown 
+                                    name="currency" 
+                                    id="currency" 
+                                    :value="setting('currency', 'BH')" 
+                                    :required="false" 
+                                    label="Currency"
+                                    placeholder="Select Currency"
+                                />
                             </div>
                             <div class="col-md-6">
                                 <label for="default_language" class="form-label">Default Language</label>
@@ -224,12 +224,14 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="default_country" class="form-label">Default Country</label>
-                                <select class="form-select" id="default_country" name="default_country">
-                                    <option value="US" {{ setting('default_country') === 'US' ? 'selected' : '' }}>United States</option>
-                                    <option value="GB" {{ setting('default_country') === 'GB' ? 'selected' : '' }}>United Kingdom</option>
-                                    <option value="BH" {{ setting('default_country') === 'BH' ? 'selected' : '' }}>Bahrain</option>
-                                    <option value="AE" {{ setting('default_country') === 'AE' ? 'selected' : '' }}>UAE</option>
-                                </select>
+                                <x-country-dropdown 
+                                    name="default_country" 
+                                    id="default_country" 
+                                    :value="setting('default_country', 'BH')" 
+                                    :required="false" 
+                                    label="Default Country"
+                                    placeholder="Select Default Country"
+                                />
                             </div>
                         </div>
                     </div>

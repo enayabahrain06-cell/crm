@@ -29,6 +29,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Your existing head content -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Custom CSS -->
     <style>
         :root {
@@ -75,6 +78,11 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--page-bg);
@@ -82,6 +90,8 @@
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
         }
 
         /* =======================
@@ -287,7 +297,34 @@
         .main-content {
             margin-left: var(--sidebar-width);
             min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            max-width: calc(100% - var(--sidebar-width));
             transition: margin-left 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--page-bg);
+        }
+
+        .page-content {
+            flex: 1;
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* Prevent table overflow behind sidebar */
+        .page-content .table-responsive {
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        /* Ensure content stays within bounds */
+        #search-results,
+        .card,
+        .table {
+            max-width: 100%;
+            overflow-x: hidden;
         }
 
         .top-header {
@@ -820,7 +857,7 @@
     </style>
 </head>
 <body>
-    <div class="d-flex">
+    <div class="d-flex overflow-hidden" style="min-height: 100vh;">
         <!-- Sidebar Overlay for Mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
@@ -830,7 +867,7 @@
         @endauth
 
         <!-- Main Content -->
-        <main class="main-content flex-grow-1">
+        <main class="main-content flex-grow-1 overflow-hidden">
             @auth
             <header class="top-header">
                 <div class="d-flex align-items-center">
@@ -873,7 +910,7 @@
             </header>
             @endauth
 
-            <div class="content-wrapper">
+            <div class="content-wrapper page-content">
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle me-2"></i>

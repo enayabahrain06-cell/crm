@@ -99,12 +99,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Country</label>
-                        <input type="text" class="form-control @error('country') is-invalid @enderror" 
-                               name="country" value="{{ old('country', $outlet->country) }}">
-                        @error('country')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <x-country-dropdown 
+                            name="country" 
+                            id="country" 
+                            :value="old('country', $outlet->country)" 
+                            :required="false" 
+                            label="Country"
+                            placeholder="Select Country"
+                        />
                     </div>
 
                     <div class="mb-3">

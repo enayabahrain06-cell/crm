@@ -287,3 +287,340 @@ if (!function_exists('canAccessOutlet')) {
         return in_array($outletId, getUserOutletIds());
     }
 }
+
+// ============================================
+// Countries Helper Functions (wrapping Countries class)
+// ============================================
+
+/**
+ * Get a specific country by ISO2 code
+ */
+if (!function_exists('country')) {
+    function country(string $iso2): ?array
+    {
+        return \App\Data\Countries::get($iso2);
+    }
+}
+
+/**
+ * Get all countries as a dropdown-friendly list (flag + name)
+ */
+if (!function_exists('countries')) {
+    function countries(): array
+    {
+        return \App\Data\Countries::list();
+    }
+}
+
+/**
+ * Get all countries indexed by ISO2 code
+ */
+if (!function_exists('countriesAll')) {
+    function countriesAll(): array
+    {
+        return \App\Data\Countries::getCountries();
+    }
+}
+
+/**
+ * Get country call code
+ */
+if (!function_exists('countryCallCode')) {
+    function countryCallCode(string $iso2): string
+    {
+        return \App\Data\Countries::callCode($iso2);
+    }
+}
+
+/**
+ * Get country currency code
+ */
+if (!function_exists('countryCurrency')) {
+    function countryCurrency(string $iso2): string
+    {
+        return \App\Data\Countries::currency($iso2);
+    }
+}
+
+/**
+ * Get country timezone
+ */
+if (!function_exists('countryTimezone')) {
+    function countryTimezone(string $iso2): string
+    {
+        return \App\Data\Countries::timezone($iso2);
+    }
+}
+
+/**
+ * Get country name (alias for getCountryName for consistency)
+ */
+if (!function_exists('countryName')) {
+    function countryName(string $iso2): string
+    {
+        return \App\Data\Countries::name($iso2);
+    }
+}
+
+/**
+ * Get country flag emoji
+ */
+if (!function_exists('countryFlag')) {
+    function countryFlag(string $iso2): string
+    {
+        return \App\Data\Countries::flag($iso2);
+    }
+}
+
+/**
+ * Get countries indexed by name (for name-based lookups)
+ */
+if (!function_exists('countriesByName')) {
+    function countriesByName(): array
+    {
+        return \App\Data\Countries::byName();
+    }
+}
+
+/**
+ * Find country ISO2 code by name
+ */
+if (!function_exists('countryCodeByName')) {
+    function countryCodeByName(string $name): ?string
+    {
+        $countries = \App\Data\Countries::byName();
+        return $countries[$name]['iso2'] ?? null;
+    }
+}
+
+// ============================================
+// Nationalities Helper Functions
+// ============================================
+
+/**
+ * Get nationality demonym from ISO2 country code
+ * e.g., "BH" -> "Bahraini", "SA" -> "Saudi", "AE" -> "Emirati"
+ */
+if (!function_exists('nationality')) {
+    function nationality(string $iso2): string
+    {
+        $demonyms = [
+            'AF' => 'Afghan',
+            'AL' => 'Albanian',
+            'DZ' => 'Algerian',
+            'AD' => 'Andorran',
+            'AO' => 'Angolan',
+            'AG' => 'Antiguan',
+            'AR' => 'Argentine',
+            'AM' => 'Armenian',
+            'AU' => 'Australian',
+            'AT' => 'Austrian',
+            'AZ' => 'Azerbaijani',
+            'BS' => 'Bahamian',
+            'BH' => 'Bahraini',
+            'BD' => 'Bangladeshi',
+            'BB' => 'Barbadian',
+            'BY' => 'Belarusian',
+            'BE' => 'Belgian',
+            'BZ' => 'Belizean',
+            'BJ' => 'Beninese',
+            'BT' => 'Bhutanese',
+            'BO' => 'Bolivian',
+            'BA' => 'Bosnian',
+            'BW' => 'Botswanan',
+            'BR' => 'Brazilian',
+            'BN' => 'Bruneian',
+            'BG' => 'Bulgarian',
+            'BF' => 'Burkinabe',
+            'BI' => 'Burundian',
+            'CV' => 'Cape Verdean',
+            'KH' => 'Cambodian',
+            'CM' => 'Cameroonian',
+            'CA' => 'Canadian',
+            'CF' => 'Central African',
+            'TD' => 'Chadian',
+            'CL' => 'Chilean',
+            'CN' => 'Chinese',
+            'CO' => 'Colombian',
+            'KM' => 'Comorian',
+            'CG' => 'Congolese',
+            'CR' => 'Costa Rican',
+            'HR' => 'Croatian',
+            'CU' => 'Cuban',
+            'CY' => 'Cypriot',
+            'CZ' => 'Czech',
+            'CD' => 'Congolese',
+            'DK' => 'Danish',
+            'DJ' => 'Djiboutian',
+            'DM' => 'Dominican',
+            'DO' => 'Dominican',
+            'EC' => 'Ecuadorian',
+            'EG' => 'Egyptian',
+            'SV' => 'Salvadoran',
+            'GQ' => 'Equatorial Guinean',
+            'ER' => 'Eritrean',
+            'EE' => 'Estonian',
+            'SZ' => 'Eswatini',
+            'ET' => 'Ethiopian',
+            'FJ' => 'Fijian',
+            'FI' => 'Finnish',
+            'FR' => 'French',
+            'GA' => 'Gabonese',
+            'GM' => 'Gambian',
+            'GE' => 'Georgian',
+            'DE' => 'German',
+            'GH' => 'Ghanaian',
+            'GR' => 'Greek',
+            'GD' => 'Grenadian',
+            'GT' => 'Guatemalan',
+            'GN' => 'Guinean',
+            'GW' => 'Guinea-Bissauan',
+            'GY' => 'Guyanese',
+            'HT' => 'Haitian',
+            'HN' => 'Honduran',
+            'HU' => 'Hungarian',
+            'IS' => 'Icelandic',
+            'IN' => 'Indian',
+            'ID' => 'Indonesian',
+            'IR' => 'Iranian',
+            'IQ' => 'Iraqi',
+            'IE' => 'Irish',
+            'IL' => 'Israeli',
+            'IT' => 'Italian',
+            'JM' => 'Jamaican',
+            'JP' => 'Japanese',
+            'JO' => 'Jordanian',
+            'KZ' => 'Kazakhstani',
+            'KE' => 'Kenyan',
+            'KI' => 'I-Kiribati',
+            'KW' => 'Kuwaiti',
+            'KG' => 'Kyrgyz',
+            'LA' => 'Lao',
+            'LV' => 'Latvian',
+            'LB' => 'Lebanese',
+            'LS' => 'Lesotho',
+            'LR' => 'Liberian',
+            'LY' => 'Libyan',
+            'LI' => 'Liechtensteiner',
+            'LT' => 'Lithuanian',
+            'LU' => 'Luxembourgish',
+            'MG' => 'Malagasy',
+            'MW' => 'Malawian',
+            'MY' => 'Malaysian',
+            'MV' => 'Maldivian',
+            'ML' => 'Malian',
+            'MT' => 'Maltese',
+            'MH' => 'Marshallese',
+            'MR' => 'Mauritanian',
+            'MU' => 'Mauritian',
+            'MX' => 'Mexican',
+            'FM' => 'Micronesian',
+            'MD' => 'Moldovan',
+            'MC' => 'Monacan',
+            'MN' => 'Mongolian',
+            'ME' => 'Montenegrin',
+            'MA' => 'Moroccan',
+            'MZ' => 'Mozambican',
+            'MM' => 'Burmese',
+            'NA' => 'Namibian',
+            'NR' => 'Nauruan',
+            'NP' => 'Nepalese',
+            'NL' => 'Dutch',
+            'NZ' => 'New Zealander',
+            'NI' => 'Nicaraguan',
+            'NE' => 'Nigerien',
+            'NG' => 'Nigerian',
+            'KP' => 'North Korean',
+            'MK' => 'Macedonian',
+            'NO' => 'Norwegian',
+            'OM' => 'Omani',
+            'PK' => 'Pakistani',
+            'PW' => 'Palauan',
+            'PS' => 'Palestinian',
+            'PA' => 'Panamanian',
+            'PG' => 'Papua New Guinean',
+            'PY' => 'Paraguayan',
+            'PE' => 'Peruvian',
+            'PH' => 'Filipino',
+            'PL' => 'Polish',
+            'PT' => 'Portuguese',
+            'QA' => 'Qatari',
+            'RO' => 'Romanian',
+            'RU' => 'Russian',
+            'RW' => 'Rwandan',
+            'KN' => 'Kittsian',
+            'LC' => 'Lucian',
+            'VC' => 'Vincentian',
+            'WS' => 'Samoan',
+            'SM' => 'San Marinese',
+            'ST' => 'Sao Tomean',
+            'SA' => 'Saudi',
+            'SN' => 'Senegalese',
+            'RS' => 'Serbian',
+            'SC' => 'Seychellois',
+            'SL' => 'Sierra Leonean',
+            'SG' => 'Singaporean',
+            'SK' => 'Slovak',
+            'SI' => 'Slovenian',
+            'SB' => 'Solomon Islander',
+            'SO' => 'Somali',
+            'ZA' => 'South African',
+            'KR' => 'South Korean',
+            'SS' => 'South Sudanese',
+            'ES' => 'Spanish',
+            'LK' => 'Sri Lankan',
+            'SD' => 'Sudanese',
+            'SR' => 'Surinamese',
+            'SE' => 'Swedish',
+            'CH' => 'Swiss',
+            'SY' => 'Syrian',
+            'TW' => 'Taiwanese',
+            'TJ' => 'Tajikistani',
+            'TZ' => 'Tanzanian',
+            'TH' => 'Thai',
+            'TL' => 'Timorese',
+            'TG' => 'Togolese',
+            'TO' => 'Tongan',
+            'TT' => 'Trinidadian',
+            'TN' => 'Tunisian',
+            'TR' => 'Turkish',
+            'TM' => 'Turkmen',
+            'TV' => 'Tuvaluan',
+            'UG' => 'Ugandan',
+            'UA' => 'Ukrainian',
+            'AE' => 'Emirati',
+            'GB' => 'British',
+            'US' => 'American',
+            'UY' => 'Uruguayan',
+            'UZ' => 'Uzbekistani',
+            'VU' => 'Ni-Vanuatu',
+            'VA' => 'Vatican',
+            'VE' => 'Venezuelan',
+            'VN' => 'Vietnamese',
+            'YE' => 'Yemeni',
+            'ZM' => 'Zambian',
+            'ZW' => 'Zimbabwean',
+        ];
+        
+        $iso2 = strtoupper($iso2);
+        return $demonyms[$iso2] ?? \App\Data\Countries::name($iso2);
+    }
+}
+
+/**
+ * Get all nationalities as an array (for dropdowns)
+ */
+if (!function_exists('nationalities')) {
+    function nationalities(): array
+    {
+        $result = [];
+        $countries = \App\Data\Countries::getCountries();
+        
+        foreach ($countries as $iso2 => $country) {
+            $result[$iso2] = nationality($iso2);
+        }
+        
+        asort($result);
+        return $result;
+    }
+}

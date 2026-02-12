@@ -39,7 +39,7 @@
                     <span><i class="bi bi-phone me-2"></i>{{ formatMobileNumber($profile->mobile_json) }}</span>
                     @endif
                     @if($profile->nationality)
-                    <span><i class="bi bi-globe me-2"></i>{{ getCountryName($profile->nationality) }}</span>
+                    <span><i class="bi bi-globe me-2"></i>{{ getCountryFlag($profile->nationality) }} {{ countryName($profile->nationality) }}</span>
                     @endif
                 </div>
             </div>

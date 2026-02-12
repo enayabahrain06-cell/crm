@@ -260,16 +260,16 @@
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <label class="form-label" for="country_code">Country</label>
-                                            <select class="form-select @error('country_code') is-invalid @enderror" id="country_code" name="country_code">
-                                                <option value="BH" {{ old('country_code', 'BH') == 'BH' ? 'selected' : '' }}>🇧🇭 Bahrain (+973)</option>
-                                                <option value="SA" {{ old('country_code') == 'SA' ? 'selected' : '' }}>🇸🇦 Saudi Arabia (+966)</option>
-                                                <option value="AE" {{ old('country_code') == 'AE' ? 'selected' : '' }}>🇦🇪 UAE (+971)</option>
-                                                <option value="KW" {{ old('country_code') == 'KW' ? 'selected' : '' }}>🇰🇼 Kuwait (+965)</option>
-                                                <option value="QA" {{ old('country_code') == 'QA' ? 'selected' : '' }}>🇶🇦 Qatar (+974)</option>
-                                                <option value="OM" {{ old('country_code') == 'OM' ? 'selected' : '' }}>🇴🇲 Oman (+968)</option>
-                                            </select>
+                                            <x-phone-code-dropdown 
+                                                name="country_code" 
+                                                id="country_code" 
+                                                :value="old('country_code', 'BH')" 
+                                                :required="false" 
+                                                label="Country"
+                                                placeholder="Select Country"
+                                            />
                                             @error('country_code')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-8 mb-3">
@@ -292,24 +292,17 @@
 
                                     <div class="mb-3">
                                         <label class="form-label" for="nationality">Nationality</label>
-                                        <select class="form-select @error('nationality') is-invalid @enderror" id="nationality" name="nationality">
-                                            <option value="">Select Nationality</option>
-                                            <option value="BH" {{ old('nationality') == 'BH' ? 'selected' : '' }}>Bahraini</option>
-                                            <option value="SA" {{ old('nationality') == 'SA' ? 'selected' : '' }}>Saudi</option>
-                                            <option value="AE" {{ old('nationality') == 'AE' ? 'selected' : '' }}>Emirati</option>
-                                            <option value="KW" {{ old('nationality') == 'KW' ? 'selected' : '' }}>Kuwaiti</option>
-                                            <option value="QA" {{ old('nationality') == 'QA' ? 'selected' : '' }}>Qatari</option>
-                                            <option value="OM" {{ old('nationality') == 'OM' ? 'selected' : '' }}>Omani</option>
-                                            <option value="EG" {{ old('nationality') == 'EG' ? 'selected' : '' }}>Egyptian</option>
-                                            <option value="JO" {{ old('nationality') == 'JO' ? 'selected' : '' }}>Jordanian</option>
-                                            <option value="IN" {{ old('nationality') == 'IN' ? 'selected' : '' }}>Indian</option>
-                                            <option value="PK" {{ old('nationality') == 'PK' ? 'selected' : '' }}>Pakistani</option>
-                                            <option value="PH" {{ old('nationality') == 'PH' ? 'selected' : '' }}>Filipino</option>
-                                            <option value="US" {{ old('nationality') == 'US' ? 'selected' : '' }}>American</option>
-                                            <option value="GB" {{ old('nationality') == 'GB' ? 'selected' : '' }}>British</option>
-                                        </select>
+                                        <x-country-dropdown 
+                                            name="nationality" 
+                                            id="nationality" 
+                                            :value="old('nationality')" 
+                                            :required="false" 
+                                            label="Nationality"
+                                            placeholder="Select Nationality"
+                                            mode="nationality"
+                                        />
                                         @error('nationality')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
                                     </div>
 
@@ -405,13 +398,14 @@
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <label class="form-label" for="corporate_country_code">Country</label>
-                                            <select class="form-select corporate-required @error('corporate_country_code') is-invalid @enderror" id="corporate_country_code" name="corporate_country_code">
-                                                <option value="BH" {{ old('corporate_country_code', 'BH') == 'BH' ? 'selected' : '' }}>🇧🇭 Bahrain (+973)</option>
-                                                <option value="SA" {{ old('corporate_country_code') == 'SA' ? 'selected' : '' }}>🇸🇦 Saudi Arabia (+966)</option>
-                                                <option value="AE" {{ old('corporate_country_code') == 'AE' ? 'selected' : '' }}>🇦🇪 UAE (+971)</option>
-                                                <option value="KW" {{ old('corporate_country_code') == 'KW' ? 'selected' : '' }}>🇰🇼 Kuwait (+965)</option>
-                                                <option value="QA" {{ old('corporate_country_code') == 'QA' ? 'selected' : '' }}>🇶🇦 Qatar (+974)</option>
-                                            </select>
+                                            <x-phone-code-dropdown 
+                                                name="corporate_country_code" 
+                                                id="corporate_country_code" 
+                                                :value="old('corporate_country_code', 'BH')" 
+                                                :required="false" 
+                                                label="Country"
+                                                placeholder="Select Country"
+                                            />
                                             @error('corporate_country_code')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror

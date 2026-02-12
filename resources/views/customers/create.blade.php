@@ -55,20 +55,14 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Country Code <span class="text-danger">*</span></label>
-                            <select class="form-select @error('country_code') is-invalid @enderror" name="country_code">
-                                <option value="BH" {{ old('country_code', 'BH') === 'BH' ? 'selected' : '' }}>BH (+973)</option>
-                                <option value="SA" {{ old('country_code') === 'SA' ? 'selected' : '' }}>SA (+966)</option>
-                                <option value="AE" {{ old('country_code') === 'AE' ? 'selected' : '' }}>AE (+971)</option>
-                                <option value="KW" {{ old('country_code') === 'KW' ? 'selected' : '' }}>KW (+965)</option>
-                                <option value="QA" {{ old('country_code') === 'QA' ? 'selected' : '' }}>QA (+974)</option>
-                                <option value="OM" {{ old('country_code') === 'OM' ? 'selected' : '' }}>OM (+968)</option>
-                                <option value="IN" {{ old('country_code') === 'IN' ? 'selected' : '' }}>IN (+91)</option>
-                                <option value="PK" {{ old('country_code') === 'PK' ? 'selected' : '' }}>PK (+92)</option>
-                                <option value="BD" {{ old('country_code') === 'BD' ? 'selected' : '' }}>BD (+880)</option>
-                                <option value="PH" {{ old('country_code') === 'PH' ? 'selected' : '' }}>PH (+63)</option>
-                                <option value="US" {{ old('country_code') === 'US' ? 'selected' : '' }}>US (+1)</option>
-                                <option value="GB" {{ old('country_code') === 'GB' ? 'selected' : '' }}>GB (+44)</option>
-                            </select>
+                            <x-phone-code-dropdown 
+                                name="country_code" 
+                                id="country_code" 
+                                :value="old('country_code', 'BH')" 
+                                :required="true" 
+                                label="Country Code"
+                                placeholder="Select Country"
+                            />
                             @error('country_code')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -86,29 +80,15 @@
                     {{-- Personal Details --}}
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Nationality</label>
-                            <select class="form-select @error('nationality') is-invalid @enderror" name="nationality">
-                                <option value="">Select</option>
-                                <option value="BH" {{ old('nationality') === 'BH' ? 'selected' : '' }}>Bahraini</option>
-                                <option value="SA" {{ old('nationality') === 'SA' ? 'selected' : '' }}>Saudi</option>
-                                <option value="AE" {{ old('nationality') === 'AE' ? 'selected' : '' }}>Emirati</option>
-                                <option value="KW" {{ old('nationality') === 'KW' ? 'selected' : '' }}>Kuwaiti</option>
-                                <option value="QA" {{ old('nationality') === 'QA' ? 'selected' : '' }}>Qatari</option>
-                                <option value="OM" {{ old('nationality') === 'OM' ? 'selected' : '' }}>Omani</option>
-                                <option value="EG" {{ old('nationality') === 'EG' ? 'selected' : '' }}>Egyptian</option>
-                                <option value="JO" {{ old('nationality') === 'JO' ? 'selected' : '' }}>Jordanian</option>
-                                <option value="LB" {{ old('nationality') === 'LB' ? 'selected' : '' }}>Lebanese</option>
-                                <option value="SY" {{ old('nationality') === 'SY' ? 'selected' : '' }}>Syrian</option>
-                                <option value="IN" {{ old('nationality') === 'IN' ? 'selected' : '' }}>Indian</option>
-                                <option value="PK" {{ old('nationality') === 'PK' ? 'selected' : '' }}>Pakistani</option>
-                                <option value="BD" {{ old('nationality') === 'BD' ? 'selected' : '' }}>Bangladeshi</option>
-                                <option value="PH" {{ old('nationality') === 'PH' ? 'selected' : '' }}>Filipino</option>
-                                <option value="US" {{ old('nationality') === 'US' ? 'selected' : '' }}>American</option>
-                                <option value="GB" {{ old('nationality') === 'GB' ? 'selected' : '' }}>British</option>
-                            </select>
-                            @error('nationality')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <x-country-dropdown 
+                                name="nationality" 
+                                id="nationality" 
+                                :value="old('nationality')" 
+                                :required="false" 
+                                label="Nationality"
+                                placeholder="Select Nationality"
+                                mode="nationality"
+                            />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Gender</label>

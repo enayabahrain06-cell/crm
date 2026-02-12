@@ -63,27 +63,14 @@
 
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label class="form-label">Country <span class="text-danger">*</span></label>
-                            <select class="form-select @error('country') is-invalid @enderror" 
-                                    id="country" name="country" required>
-                                <option value="">Select Country</option>
-                                <option value="Bahrain" {{ old('country') === 'Bahrain' ? 'selected' : '' }}>🇧🇭 Bahrain</option>
-                                <option value="Saudi Arabia" {{ old('country') === 'Saudi Arabia' ? 'selected' : '' }}>🇸🇦 Saudi Arabia</option>
-                                <option value="UAE" {{ old('country') === 'UAE' ? 'selected' : '' }}>🇦🇪 UAE</option>
-                                <option value="Kuwait" {{ old('country') === 'Kuwait' ? 'selected' : '' }}>🇰🇼 Kuwait</option>
-                                <option value="Qatar" {{ old('country') === 'Qatar' ? 'selected' : '' }}>🇶🇦 Qatar</option>
-                                <option value="Oman" {{ old('country') === 'Oman' ? 'selected' : '' }}>🇴🇲 Oman</option>
-                                <option value="Egypt" {{ old('country') === 'Egypt' ? 'selected' : '' }}>🇪🇬 Egypt</option>
-                                <option value="Jordan" {{ old('country') === 'Jordan' ? 'selected' : '' }}>🇯🇴 Jordan</option>
-                                <option value="India" {{ old('country') === 'India' ? 'selected' : '' }}>🇮🇳 India</option>
-                                <option value="Pakistan" {{ old('country') === 'Pakistan' ? 'selected' : '' }}>🇵🇰 Pakistan</option>
-                                <option value="Philippines" {{ old('country') === 'Philippines' ? 'selected' : '' }}>🇵🇭 Philippines</option>
-                                <option value="USA" {{ old('country') === 'USA' ? 'selected' : '' }}>🇺🇸 USA</option>
-                                <option value="UK" {{ old('country') === 'UK' ? 'selected' : '' }}>🇬🇧 UK</option>
-                            </select>
-                            @error('country')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <x-country-dropdown 
+                                name="country" 
+                                id="country" 
+                                :value="old('country', 'BH')" 
+                                :required="true" 
+                                label="Country" 
+                                placeholder="Select Country"
+                            />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">State/Province <span class="text-danger">*</span></label>
