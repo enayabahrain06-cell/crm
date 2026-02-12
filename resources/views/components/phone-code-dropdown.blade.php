@@ -16,8 +16,6 @@
 @endphp
 
 <div class="phone-code-dropdown-wrapper" x-data="phoneCodeDropdown(@js($countries), @js($selectedCountry))" @country-changed.window="updateFromCountry($event.detail)">
-    <label class="dropdown-label">Phone Code</label>
-    
     <div class="dropdown-container">
         <button 
             type="button" 

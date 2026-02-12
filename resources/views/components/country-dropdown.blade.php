@@ -74,8 +74,6 @@
     </div>
 
     <input type="hidden" name="{{ $name }}" :value="selectedCountry?.iso2 || ''" id="{{ $id }}">
-    
-    <p class="helper-text">Selecting a country will automatically set currency, timezone, and phone code</p>
 </div>
 
 <style>

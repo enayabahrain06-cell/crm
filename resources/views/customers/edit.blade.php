@@ -96,9 +96,9 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Gender</label>
-                            <select class="form-select @error('gender') is-invalid @enderror" name="gender">
-                                <option value="male" {{ old('gender', $customer->gender ?? 'male') === 'male' ? 'selected' : '' }}>Male</option>
-                                <option value="female" {{ old('gender', $customer->gender) === 'female' ? 'selected' : '' }}>Female</option>
+                            <select class="form-select @error('gender') is-invalid @endreja" name="gender">
+                                <option value="male" {{ old('gender', $customer->gender ?? 'male') === 'male' ? 'selected' : '' }}>👨 Male</option>
+                                <option value="female" {{ old('gender', $customer->gender) === 'female' ? 'selected' : '' }}>👩 Female</option>
                             </select>
                             @error('gender')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -206,8 +206,9 @@ document.addEventListener('DOMContentLoaded', function() {
         corporateFields.style.display = typeCorporate.checked ? 'block' : 'none';
     }
 
-    typeIndividual.addEventListener('change', toggleCorporateFields);
-    typeCorporate.addEventListener('change', toggleCorporateFields);
+    // Use click events on the inputs directly for more reliable handling with Bootstrap btn-check
+    typeIndividual.addEventListener('click', toggleCorporateFields);
+    typeCorporate.addEventListener('click', toggleCorporateFields);
 
     // Initial state
     toggleCorporateFields();
